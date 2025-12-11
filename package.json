@@ -1,0 +1,17 @@
+{
+  "name": "valtori-realtime-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "WebSocket server for Valtori AI real-time voice calls",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

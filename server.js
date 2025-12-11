@@ -67,6 +67,11 @@ Start by answering the call with a brief greeting.`,
         const message = JSON.parse(data.toString());
         
         console.log('🤖 OpenAI event:', message.type);
+
+// Log response content
+if (message.type === 'response.done') {
+    console.log('📝 Response content:', JSON.stringify(message.response));
+}
         
         // Forward relevant events to client
         if (message.type === 'session.created' ||

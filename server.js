@@ -109,7 +109,7 @@ Start by answering the call with a brief greeting.`,
     };
     
     // Handle client messages
-    cclientWs.on('message', (data) => {
+    clientWs.on('message', (data) => {
     try {
         // Check if it's JSON (control message) or binary (audio)
         if (typeof data === 'string' || (data[0] === 0x7B)) { // JSON

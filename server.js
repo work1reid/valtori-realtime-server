@@ -2,7 +2,7 @@
 import WebSocket, { WebSocketServer } from 'ws';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const PORT = process.env.PORT || 8080;
+const PORT = parseInt(process.env.PORT) || 8080;
 
 const wss = new WebSocketServer({ port: PORT });
 

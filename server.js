@@ -63,35 +63,39 @@ Start by answering the call with a brief greeting.`,
         });
         
         openaiWs.on('message', (data) => {
-            try {
-                const message = JSON.parse(data.toString());
-                
-                // Forward relevant events to client
-                if (message.type === 'session.created' ||
-                    message.type === 'session.updated' ||
-                    message.type === 'response.audio.delta' ||
-                    message.type === 'response.audio.done' ||
-                    message.type === 'response.text.delta' ||
-                    message.type === 'response.text.done' ||
-                    message.type === 'response.done' ||
-                    message.type === 'conversation.item.created' ||
-                    message.type === 'input_audio_buffer.speech_started' ||
-                    message.type === 'input_audio_buffer.speech_stopped' ||
-                    message.type === 'error') {
-                    
-                    if (clientWs.readyState === WebSocket.OPEN) {
-                        clientWs.send(JSON.stringify(message));
-                    }
-                }
-                
-                // Log errors
-                if (message.type === 'error') {
-                    console.error('❌ OpenAI error:', message.error);
-                }
-            } catch (err) {
-                console.error('Error parsing OpenAI message:', err);
+    try {
+        const message = JSON.parse(data.toString());
+        
+        console.log('🤖 OpenAI event:', message.type);
+        
+        // Forward relevant events to client
+        if (message.type === 'session.created' ||
+            message.type === 'session.updated' ||
+            message.type === 'response.audio.delta' ||
+            message.type === 'response.audio.done' ||
+            message.type === 'response.text.delta' ||
+            message.type === 'response.text.done' ||
+            message.type === 'response.done' ||
+            message.type === 'conversation.item.created' ||
+            message.type === 'input_audio_buffer.speech_started' ||
+            message.type === 'input_audio_buffer.speech_stopped' ||
+            message.type === 'error') {
+            
+            if (clientWs.readyState === WebSocket.OPEN) {
+                clientWs.send(JSON.stringify(message));
             }
-        });
+        }
+        
+        // Log errors
+        if (message.type === 'error') {
+            console.error('❌ OpenAI error:', JSON.stringify(message.error));
+        }
+    } catch (err) {
+        console.error('Error parsing OpenAI message:', err);
+    }
+});
+                
+            
         
         openaiWs.on('error', (error) => {
             console.error('❌ OpenAI WebSocket error:', error);

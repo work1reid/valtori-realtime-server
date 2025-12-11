@@ -109,24 +109,26 @@ Start by answering the call with a brief greeting.`,
     };
     
     // Handle client messages
-    clientWs.on('message', (data) => {
+    cclientWs.on('message', (data) => {
     try {
         // Check if it's JSON (control message) or binary (audio)
-        if (data[0] === 0x7B) { // '{' character (JSON)
-            const message = JSON.parse(data.toString());
+        if (typeof data === 'string' || (data[0] === 0x7B)) { // JSON
+            const message = typeof data === 'string' ? JSON.parse(data) : JSON.parse(data.toString());
             console.log('📨 Client message:', message.type);
             
             if (message.type === 'start') {
                 connectToOpenAI();
             } else if (openaiWs && openaiWs.readyState === WebSocket.OPEN) {
-                console.log('➡️ Forwarding to OpenAI:', message.type);
                 openaiWs.send(JSON.stringify(message));
             }
         } else {
-            // Binary audio data - forward to OpenAI
-            console.log('🎵 Audio data received, size:', data.length);
+            // Binary audio data - convert to base64 and send to OpenAI
             if (openaiWs && openaiWs.readyState === WebSocket.OPEN) {
-                openaiWs.send(data);
+                const base64Audio = Buffer.from(data).toString('base64');
+                openaiWs.send(JSON.stringify({
+                    type: 'input_audio_buffer.append',
+                    audio: base64Audio
+                }));
             }
         }
     } catch (err) {

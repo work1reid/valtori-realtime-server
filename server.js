@@ -110,26 +110,29 @@ Start by answering the call with a brief greeting.`,
     
     // Handle client messages
     clientWs.on('message', (data) => {
-        try {
-            // Check if it's JSON (control message) or binary (audio)
-            if (data[0] === 0x7B) { // '{' character (JSON)
-                const message = JSON.parse(data.toString());
-                
-                if (message.type === 'start') {
-                    connectToOpenAI();
-                } else if (openaiWs && openaiWs.readyState === WebSocket.OPEN) {
-                    openaiWs.send(JSON.stringify(message));
-                }
-            } else {
-                // Binary audio data - forward to OpenAI
-                if (openaiWs && openaiWs.readyState === WebSocket.OPEN) {
-                    openaiWs.send(data);
-                }
+    try {
+        // Check if it's JSON (control message) or binary (audio)
+        if (data[0] === 0x7B) { // '{' character (JSON)
+            const message = JSON.parse(data.toString());
+            console.log('📨 Client message:', message.type);
+            
+            if (message.type === 'start') {
+                connectToOpenAI();
+            } else if (openaiWs && openaiWs.readyState === WebSocket.OPEN) {
+                console.log('➡️ Forwarding to OpenAI:', message.type);
+                openaiWs.send(JSON.stringify(message));
             }
-        } catch (err) {
-            console.error('Error handling client message:', err);
+        } else {
+            // Binary audio data - forward to OpenAI
+            console.log('🎵 Audio data received, size:', data.length);
+            if (openaiWs && openaiWs.readyState === WebSocket.OPEN) {
+                openaiWs.send(data);
+            }
         }
-    });
+    } catch (err) {
+        console.error('Error handling client message:', err);
+    }
+});
     
     clientWs.on('close', () => {
         console.log('📴 Client disconnected');
